@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 /* SafeX Solutions brand tokens */
 const BRAND = {
@@ -274,20 +274,23 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [supportEmail, setSupportEmail] = useState("");
   const [supportSent, setSupportSent] = useState(false);
+  const [candidates, setCandidates] = useState(MOCK_CANDIDATES);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
   const statusCounts = useMemo(() => {
-    const counts = { "All Statuses": MOCK_CANDIDATES.length };
+    const counts = { "All Statuses": candidates.length };
+
     STATUS_OPTIONS.slice(1).forEach((status) => {
-      counts[status] = MOCK_CANDIDATES.filter(
-        (c) => c.status === status,
-      ).length;
+      counts[status] = candidates.filter((c) => c.status === status).length;
     });
+
     return counts;
-  }, []);
+  }, [candidates]);
 
   const filteredCandidates = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    return MOCK_CANDIDATES.filter((c) => {
+    return candidates.filter((c) => {
       const matchesSearch =
         term === "" ||
         c.name.toLowerCase().includes(term) ||
@@ -296,7 +299,35 @@ export default function App() {
         statusFilter === "All Statuses" || c.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [searchTerm, statusFilter]);
+  }, [searchTerm, statusFilter, candidates]);
+
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL;
+
+    console.log("API URL:", apiUrl);
+
+    fetch(`${apiUrl}/candidates`)
+      .then((res) => {
+        console.log("HTTP status:", res.status);
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Fetched candidates:", data);
+
+        setCandidates(data);
+        setFetchError(null);
+      })
+      .catch((err) => {
+        console.error("Fetch failed:", err);
+
+        setFetchError("Couldn't reach the server — showing sample data.");
+        setCandidates(MOCK_CANDIDATES);
+      })
+      .finally(() => {
+        console.log("Finished fetch");
+        setIsLoading(false);
+      });
+  }, []);
 
   const totalPages = Math.max(
     1,
@@ -329,14 +360,10 @@ export default function App() {
     setTimeout(() => setSupportSent(false), 4000);
   };
 
-  const handleView = (name) =>
-    alert(
-      `Full profile for ${name} — coming soon once the .NET backend is connected.`,
-    );
-  const handleResume = (name) =>
-    alert(
-      `Resume preview for ${name} — coming soon once file storage is connected.`,
-    );
+  const handleView = (name) => {
+    console.log(`View profile for ${name}`);
+  };
+  const handleResume = (name) => alert(`Resume preview for ${name} `);
 
   return (
     <div style={styles.page}>
@@ -399,6 +426,18 @@ export default function App() {
               + New Candidate
             </button>
           </header>
+
+          {fetchError && (
+            <p
+              style={{
+                color: "#B23B3B",
+                fontSize: 12,
+                padding: "6px 24px",
+              }}
+            >
+              {fetchError}
+            </p>
+          )}
 
           {/* Tabs */}
           <div style={styles.tabStrip}>
