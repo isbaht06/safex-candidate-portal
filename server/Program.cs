@@ -1,3 +1,5 @@
+using SafeXCandidatePortal.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -9,6 +11,18 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+var smtpSettings = builder.Configuration.GetSection("Smtp").Get<SmtpSettings>() ?? new SmtpSettings();
+builder.Services.AddSingleton(smtpSettings);
+
+if (string.IsNullOrWhiteSpace(smtpSettings.Host))
+{
+    builder.Services.AddScoped<IEmailService, ConsoleEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+}
 
 // Add services to the container.
 

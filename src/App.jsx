@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
-/* SafeX Solutions brand tokens */
 const BRAND = {
   navyDeep: "#0B2545",
   navy: "#13355E",
@@ -15,7 +14,6 @@ const BRAND = {
   footerNavy: "#0F2A44",
 };
 
-/* Simple inline icon */
 const iconProps = {
   width: 20,
   height: 20,
@@ -106,15 +104,14 @@ const IconDocument = () => (
   </svg>
 );
 
-/* Mock candidate data  */
 const MOCK_CANDIDATES = [
   {
     id: 1,
     name: "Fatima Khan",
     role: "Frontend Developer Intern",
     status: "Interview Scheduled",
-    email: "fatima.khan@gmail.com",
-    experience: "1 year React",
+    email: "fatima.khan@example.com",
+    experience: "1 yr React",
     location: "Islamabad",
     appliedDate: "Jun 29",
   },
@@ -123,7 +120,7 @@ const MOCK_CANDIDATES = [
     name: "Omar Siddiqui",
     role: "Cybersecurity Intern",
     status: "New Application",
-    email: "omar.siddiqui@gmail.com",
+    email: "omar.siddiqui@example.com",
     experience: "Fresh Graduate",
     location: "Karachi",
     appliedDate: "Jun 28",
@@ -133,8 +130,8 @@ const MOCK_CANDIDATES = [
     name: "Zainab Malik",
     role: "UI/UX Design Intern",
     status: "Offer Extended",
-    email: "zainab.malik@gmail.com",
-    experience: "2 years Figma",
+    email: "zainab.malik@example.com",
+    experience: "2 yrs Figma",
     location: "Lahore",
     appliedDate: "Jun 28",
   },
@@ -143,8 +140,8 @@ const MOCK_CANDIDATES = [
     name: "Bilal Ahmed",
     role: "Backend Developer Intern",
     status: "Hired",
-    email: "bilal.ahmed@gmail.com",
-    experience: "1.5 years .NET",
+    email: "bilal.ahmed@example.com",
+    experience: "1.5 yrs .NET",
     location: "Rawalpindi",
     appliedDate: "Jun 27",
   },
@@ -153,7 +150,7 @@ const MOCK_CANDIDATES = [
     name: "Ayesha Raza",
     role: "Data Analyst Intern",
     status: "New Application",
-    email: "ayesha.raza@gmail.com",
+    email: "ayesha.raza@example.com",
     experience: "Fresh Graduate",
     location: "Islamabad",
     appliedDate: "Jun 26",
@@ -163,8 +160,8 @@ const MOCK_CANDIDATES = [
     name: "Hassan Iqbal",
     role: "Cloud Engineering Intern",
     status: "Interview Scheduled",
-    email: "hassan.iqbal@gmail.com",
-    experience: "1 year Azure",
+    email: "hassan.iqbal@example.com",
+    experience: "1 yr Azure",
     location: "Karachi",
     appliedDate: "Jun 25",
   },
@@ -173,7 +170,7 @@ const MOCK_CANDIDATES = [
     name: "Sana Tariq",
     role: "Marketing Intern",
     status: "Rejected",
-    email: "sana.tariq@gmail.com",
+    email: "sana.tariq@example.com",
     experience: "6 months",
     location: "Lahore",
     appliedDate: "Jun 24",
@@ -183,7 +180,7 @@ const MOCK_CANDIDATES = [
     name: "Usman Farooq",
     role: "Frontend Developer Intern",
     status: "New Application",
-    email: "usman.farooq@gmail.com",
+    email: "usman.farooq@example.com",
     experience: "Fresh Graduate",
     location: "Peshawar",
     appliedDate: "Jun 23",
@@ -193,8 +190,8 @@ const MOCK_CANDIDATES = [
     name: "Mariam Chaudhry",
     role: "Cybersecurity Intern",
     status: "Offer Extended",
-    email: "mariam.chaudhry@gmail.com",
-    experience: "1 year SOC",
+    email: "mariam.chaudhry@example.com",
+    experience: "1 yr SOC",
     location: "Islamabad",
     appliedDate: "Jun 22",
   },
@@ -203,8 +200,8 @@ const MOCK_CANDIDATES = [
     name: "Ahmed Raza",
     role: "Backend Developer Intern",
     status: "Interview Scheduled",
-    email: "ahmed.raza@gmail.com",
-    experience: "2 years Node.js",
+    email: "ahmed.raza@example.com",
+    experience: "2 yrs Node.js",
     location: "Karachi",
     appliedDate: "Jun 21",
   },
@@ -213,7 +210,7 @@ const MOCK_CANDIDATES = [
     name: "Noor-ul-Ain",
     role: "UI/UX Design Intern",
     status: "New Application",
-    email: "noor.ulain@gmail.com",
+    email: "noor.ulain@example.com",
     experience: "Fresh Graduate",
     location: "Rawalpindi",
     appliedDate: "Jun 20",
@@ -223,8 +220,8 @@ const MOCK_CANDIDATES = [
     name: "Bilquis Noor",
     role: "Data Analyst Intern",
     status: "Hired",
-    email: "bilquis.noor@gmail.com",
-    experience: "1 year SQL",
+    email: "bilquis.noor@example.com",
+    experience: "1 yr SQL",
     location: "Lahore",
     appliedDate: "Jun 19",
   },
@@ -256,6 +253,14 @@ const NAV_ITEMS = [
 ];
 
 const PAGE_SIZE = 6;
+const EMPTY_NEW_CANDIDATE = {
+  name: "",
+  role: "",
+  status: "New Application",
+  email: "",
+  experience: "",
+  location: "",
+};
 
 function getInitials(name) {
   return name
@@ -267,24 +272,76 @@ function getInitials(name) {
     .toUpperCase();
 }
 
+function Modal({ title, onClose, children, width = 440 }) {
+  return (
+    <div style={styles.modalOverlay} onClick={onClose}>
+      <div
+        style={{ ...styles.modalCard, maxWidth: width }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={styles.modalHeader}>
+          <h3 style={styles.modalTitle}>{title}</h3>
+          <button
+            style={styles.modalClose}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   const [activeNav, setActiveNav] = useState("candidates");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Statuses");
   const [currentPage, setCurrentPage] = useState(1);
   const [supportEmail, setSupportEmail] = useState("");
   const [supportSent, setSupportSent] = useState(false);
+
   const [candidates, setCandidates] = useState(MOCK_CANDIDATES);
-  const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newCandidate, setNewCandidate] = useState(EMPTY_NEW_CANDIDATE);
+  const [addSubmitting, setAddSubmitting] = useState(false);
+  const [addError, setAddError] = useState(null);
+
+  const [viewingCandidate, setViewingCandidate] = useState(null);
+
+  const [emailingCandidate, setEmailingCandidate] = useState(null);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailResult, setEmailResult] = useState(null);
+
+  useEffect(() => {
+    fetch(`${apiUrl}/candidates`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Server returned an error");
+        return res.json();
+      })
+      .then((data) => {
+        setCandidates(data);
+        setFetchError(null);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch candidates, using mock data:", err);
+        setFetchError("Couldn't reach the server — showing sample data.");
+      });
+  }, [apiUrl]);
 
   const statusCounts = useMemo(() => {
     const counts = { "All Statuses": candidates.length };
-
     STATUS_OPTIONS.slice(1).forEach((status) => {
       counts[status] = candidates.filter((c) => c.status === status).length;
     });
-
     return counts;
   }, [candidates]);
 
@@ -300,34 +357,6 @@ export default function App() {
       return matchesSearch && matchesStatus;
     });
   }, [searchTerm, statusFilter, candidates]);
-
-  useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL;
-
-    console.log("API URL:", apiUrl);
-
-    fetch(`${apiUrl}/candidates`)
-      .then((res) => {
-        console.log("HTTP status:", res.status);
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Fetched candidates:", data);
-
-        setCandidates(data);
-        setFetchError(null);
-      })
-      .catch((err) => {
-        console.error("Fetch failed:", err);
-
-        setFetchError("Couldn't reach the server — showing sample data.");
-        setCandidates(MOCK_CANDIDATES);
-      })
-      .finally(() => {
-        console.log("Finished fetch");
-        setIsLoading(false);
-      });
-  }, []);
 
   const totalPages = Math.max(
     1,
@@ -360,10 +389,89 @@ export default function App() {
     setTimeout(() => setSupportSent(false), 4000);
   };
 
-  const handleView = (name) => {
-    console.log(`View profile for ${name}`);
+  const handleResume = (name) =>
+    alert(
+      `Resume preview for ${name} — coming soon once file storage is connected.`,
+    );
+
+  // ---- Add Candidate ----
+  const closeAddModal = () => {
+    setShowAddModal(false);
+    setNewCandidate(EMPTY_NEW_CANDIDATE);
+    setAddError(null);
   };
-  const handleResume = (name) => alert(`Resume preview for ${name} `);
+  const updateNewCandidate = (field, value) =>
+    setNewCandidate((prev) => ({ ...prev, [field]: value }));
+  const handleAddCandidate = async (e) => {
+    e.preventDefault();
+    setAddSubmitting(true);
+    setAddError(null);
+    try {
+      const res = await fetch(`${apiUrl}/candidates`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCandidate),
+      });
+      if (!res.ok) throw new Error("Server rejected the request");
+      const created = await res.json();
+      setCandidates((prev) => [...prev, created]);
+      closeAddModal();
+    } catch (err) {
+      console.error(err);
+      setAddError("Couldn't add the candidate. Is the backend running?");
+    } finally {
+      setAddSubmitting(false);
+    }
+  };
+
+  // ---- View Profile ----
+  const openProfile = (candidate) => setViewingCandidate(candidate);
+  const closeProfile = () => setViewingCandidate(null);
+
+  // ---- Compose / Send Email ----
+  const openEmailModal = (candidate) => {
+    setEmailingCandidate(candidate);
+    setEmailSubject(`Regarding your application — ${candidate.role}`);
+    setEmailBody(
+      `Hi ${candidate.name.split(" ")[0]},\n\nThank you for applying to SafeX Solutions. We wanted to reach out regarding your application status.\n\nBest regards,\nSafeX Solutions HR Team`,
+    );
+    setEmailResult(null);
+  };
+  const closeEmailModal = () => {
+    setEmailingCandidate(null);
+    setEmailSending(false);
+    setEmailResult(null);
+  };
+  const handleSendEmail = async (e) => {
+    e.preventDefault();
+    setEmailSending(true);
+    setEmailResult(null);
+    try {
+      const res = await fetch(
+        `${apiUrl}/candidates/${emailingCandidate.id}/email`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subject: emailSubject, body: emailBody }),
+        },
+      );
+      if (!res.ok) throw new Error("Server rejected the request");
+      setEmailResult({
+        success: true,
+        message:
+          "Email sent — check your backend terminal for the logged message (dev mode).",
+      });
+      setTimeout(closeEmailModal, 2200);
+    } catch (err) {
+      console.error(err);
+      setEmailResult({
+        success: false,
+        message: "Couldn't send the email. Is the backend running?",
+      });
+    } finally {
+      setEmailSending(false);
+    }
+  };
 
   return (
     <div style={styles.page}>
@@ -371,18 +479,19 @@ export default function App() {
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap');
         * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Inter', sans-serif; }
-        input:focus, select:focus, button:focus { outline: 2px solid ${BRAND.accent}; outline-offset: 1px; }
+        input:focus, select:focus, button:focus, textarea:focus { outline: 2px solid ${BRAND.accent}; outline-offset: 1px; }
         .nav-item:hover { background: rgba(255,255,255,0.08); }
         .table-row:hover { background: ${BRAND.bgPanel}; }
         .page-btn:hover:not(:disabled) { background: ${BRAND.bgSoft}; }
         .tab-btn:hover { color: ${BRAND.navy}; }
         .support-btn:hover { background: ${BRAND.navyLight}; }
-        .email-link:hover { text-decoration: underline; }
         .action-btn:hover { background: ${BRAND.bgSoft}; color: ${BRAND.navy}; }
+        .email-cell-btn:hover { text-decoration: underline; }
       `}</style>
 
+      {fetchError && <p style={styles.fetchErrorBanner}>{fetchError}</p>}
+
       <div style={styles.appBody}>
-        {/* Icon sidebar */}
         <nav style={styles.sidebar} aria-label="Primary navigation">
           <div style={styles.sidebarLogo}>SX</div>
           {NAV_ITEMS.map(({ key, label, Icon }) => (
@@ -407,9 +516,7 @@ export default function App() {
           ))}
         </nav>
 
-        {/* Main content column */}
         <div style={styles.contentCol}>
-          {/* Top bar */}
           <header style={styles.topBar}>
             <div>
               <p style={styles.eyebrow}>SafeX Solutions</p>
@@ -419,27 +526,12 @@ export default function App() {
             </div>
             <button
               style={styles.newCandidateBtn}
-              onClick={() =>
-                alert("This will connect to the .NET backend once it's ready.")
-              }
+              onClick={() => setShowAddModal(true)}
             >
               + New Candidate
             </button>
           </header>
 
-          {fetchError && (
-            <p
-              style={{
-                color: "#B23B3B",
-                fontSize: 12,
-                padding: "6px 24px",
-              }}
-            >
-              {fetchError}
-            </p>
-          )}
-
-          {/* Tabs */}
           <div style={styles.tabStrip}>
             {STATUS_OPTIONS.map((status) => (
               <button
@@ -472,7 +564,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* Workspace: filter panel + table */}
           <div style={styles.workspace}>
             <aside style={styles.filterPanel}>
               <p style={styles.filterHeading}>Refine Your Search</p>
@@ -549,7 +640,9 @@ export default function App() {
                       </thead>
                       <tbody>
                         {pageCandidates.map((c) => {
-                          const badge = STATUS_STYLES[c.status];
+                          const badge =
+                            STATUS_STYLES[c.status] ||
+                            STATUS_STYLES["New Application"];
                           return (
                             <tr
                               key={c.id}
@@ -584,10 +677,10 @@ export default function App() {
                               </td>
                               <td style={styles.tdMuted}>{c.appliedDate}</td>
                               <td style={styles.td}>
-                                <a
-                                  href={`mailto:${c.email}`}
-                                  className="email-link"
-                                  style={styles.emailLink}
+                                <button
+                                  className="email-cell-btn"
+                                  style={styles.emailCellBtn}
+                                  onClick={() => openEmailModal(c)}
                                 >
                                   <div style={styles.emailStack}>
                                     <span style={styles.emailAddress}>
@@ -597,7 +690,7 @@ export default function App() {
                                       Send Email
                                     </span>
                                   </div>
-                                </a>
+                                </button>
                               </td>
                               <td style={styles.tdActions}>
                                 <div style={styles.actionRow}>
@@ -606,22 +699,19 @@ export default function App() {
                                     title="View profile"
                                     aria-label={`View ${c.name}'s profile`}
                                     style={styles.actionBtn}
-                                    onClick={() => handleView(c.name)}
+                                    onClick={() => openProfile(c)}
                                   >
                                     <IconEye />
                                   </button>
-                                  <a
-                                    href={`mailto:${c.email}`}
+                                  <button
                                     className="action-btn"
                                     title="Email candidate"
                                     aria-label={`Email ${c.name}`}
-                                    style={{
-                                      ...styles.actionBtn,
-                                      textDecoration: "none",
-                                    }}
+                                    style={styles.actionBtn}
+                                    onClick={() => openEmailModal(c)}
                                   >
                                     <IconMail />
-                                  </a>
+                                  </button>
                                   <button
                                     className="action-btn"
                                     title="View resume"
@@ -693,7 +783,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Footer  */}
       <footer style={styles.footer}>
         <div style={styles.footerInner}>
           <div style={styles.footerCol}>
@@ -709,7 +798,6 @@ export default function App() {
               ))}
             </div>
           </div>
-
           <div style={styles.footerCol}>
             <h4 style={styles.footerHeading}>Contact</h4>
             <p style={styles.footerLabel}>PHONE</p>
@@ -717,7 +805,6 @@ export default function App() {
             <p style={styles.footerLabel}>EMAIL</p>
             <p style={styles.footerValue}>contact@safexsolutions.com</p>
           </div>
-
           <div style={styles.footerCol}>
             <h4 style={styles.footerHeading}>Portal Support</h4>
             <form onSubmit={handleSupportSubmit} style={styles.supportForm}>
@@ -752,17 +839,239 @@ export default function App() {
           © {new Date().getFullYear()} All rights reserved | SafeXsolutions.com
         </div>
       </footer>
+
+      {/* View Profile Modal */}
+      {viewingCandidate && (
+        <Modal title="Candidate Profile" onClose={closeProfile}>
+          <div style={styles.profileHeader}>
+            <div
+              style={{ ...styles.avatar, width: 56, height: 56, fontSize: 18 }}
+            >
+              {getInitials(viewingCandidate.name)}
+            </div>
+            <div>
+              <p style={styles.profileName}>{viewingCandidate.name}</p>
+              <p style={styles.profileRole}>{viewingCandidate.role}</p>
+            </div>
+          </div>
+          <div style={styles.profileGrid}>
+            <div>
+              <span style={styles.profileLabel}>Status</span>
+              <span
+                style={{
+                  ...styles.badge,
+                  backgroundColor: (
+                    STATUS_STYLES[viewingCandidate.status] || {}
+                  ).bg,
+                  color: (STATUS_STYLES[viewingCandidate.status] || {}).text,
+                }}
+              >
+                {viewingCandidate.status}
+              </span>
+            </div>
+            <div>
+              <span style={styles.profileLabel}>Location</span>
+              <span style={styles.profileValue}>
+                {viewingCandidate.location}
+              </span>
+            </div>
+            <div>
+              <span style={styles.profileLabel}>Experience</span>
+              <span style={styles.profileValue}>
+                {viewingCandidate.experience}
+              </span>
+            </div>
+            <div>
+              <span style={styles.profileLabel}>Applied</span>
+              <span style={styles.profileValue}>
+                {viewingCandidate.appliedDate}
+              </span>
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <span style={styles.profileLabel}>Email</span>
+              <span style={styles.profileValue}>{viewingCandidate.email}</span>
+            </div>
+          </div>
+          <div style={styles.modalActions}>
+            <button style={styles.secondaryBtn} onClick={closeProfile}>
+              Close
+            </button>
+            <button
+              style={styles.primaryBtn}
+              onClick={() => {
+                closeProfile();
+                openEmailModal(viewingCandidate);
+              }}
+            >
+              Email Candidate
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Compose Email Modal */}
+      {emailingCandidate && (
+        <Modal
+          title={`Email ${emailingCandidate.name}`}
+          onClose={closeEmailModal}
+          width={480}
+        >
+          <form onSubmit={handleSendEmail}>
+            <label style={styles.formLabel}>To</label>
+            <input
+              style={styles.formInputDisabled}
+              value={emailingCandidate.email}
+              disabled
+            />
+
+            <label style={styles.formLabel}>Subject</label>
+            <input
+              style={styles.formInput}
+              value={emailSubject}
+              onChange={(e) => setEmailSubject(e.target.value)}
+              required
+            />
+
+            <label style={styles.formLabel}>Message</label>
+            <textarea
+              style={styles.formTextarea}
+              rows={6}
+              value={emailBody}
+              onChange={(e) => setEmailBody(e.target.value)}
+              required
+            />
+
+            {emailResult && (
+              <p
+                style={{
+                  ...styles.formHint,
+                  color: emailResult.success ? "#1F9D55" : "#B23B3B",
+                }}
+              >
+                {emailResult.message}
+              </p>
+            )}
+
+            <div style={styles.modalActions}>
+              <button
+                type="button"
+                style={styles.secondaryBtn}
+                onClick={closeEmailModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                style={styles.primaryBtn}
+                disabled={emailSending}
+              >
+                {emailSending ? "Sending..." : "Send Email"}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Add Candidate Modal */}
+      {showAddModal && (
+        <Modal title="Add New Candidate" onClose={closeAddModal} width={480}>
+          <form onSubmit={handleAddCandidate}>
+            <label style={styles.formLabel}>Full Name</label>
+            <input
+              style={styles.formInput}
+              value={newCandidate.name}
+              onChange={(e) => updateNewCandidate("name", e.target.value)}
+              required
+            />
+
+            <label style={styles.formLabel}>Role</label>
+            <input
+              style={styles.formInput}
+              value={newCandidate.role}
+              onChange={(e) => updateNewCandidate("role", e.target.value)}
+              placeholder="e.g. Frontend Developer Intern"
+              required
+            />
+
+            <label style={styles.formLabel}>Status</label>
+            <select
+              style={styles.formInput}
+              value={newCandidate.status}
+              onChange={(e) => updateNewCandidate("status", e.target.value)}
+            >
+              {STATUS_OPTIONS.slice(1).map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+
+            <label style={styles.formLabel}>Email</label>
+            <input
+              type="email"
+              style={styles.formInput}
+              value={newCandidate.email}
+              onChange={(e) => updateNewCandidate("email", e.target.value)}
+              required
+            />
+
+            <label style={styles.formLabel}>Experience</label>
+            <input
+              style={styles.formInput}
+              value={newCandidate.experience}
+              onChange={(e) => updateNewCandidate("experience", e.target.value)}
+              placeholder="e.g. 1 yr React"
+            />
+
+            <label style={styles.formLabel}>Location</label>
+            <input
+              style={styles.formInput}
+              value={newCandidate.location}
+              onChange={(e) => updateNewCandidate("location", e.target.value)}
+              placeholder="e.g. Islamabad"
+            />
+
+            {addError && (
+              <p style={{ ...styles.formHint, color: "#B23B3B" }}>{addError}</p>
+            )}
+
+            <div style={styles.modalActions}>
+              <button
+                type="button"
+                style={styles.secondaryBtn}
+                onClick={closeAddModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                style={styles.primaryBtn}
+                disabled={addSubmitting}
+              >
+                {addSubmitting ? "Adding..." : "Add Candidate"}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 }
 
-/* Styles */
 const styles = {
   page: {
     minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
     background: BRAND.bgSoft,
+  },
+  fetchErrorBanner: {
+    background: "#FFF4E0",
+    color: "#9A6A00",
+    fontSize: "12.5px",
+    padding: "8px 24px",
+    margin: 0,
+    textAlign: "center",
   },
   appBody: { display: "flex", flex: 1 },
 
@@ -864,8 +1173,6 @@ const styles = {
   },
   tabCount: {
     fontSize: "11px",
-    background: BRAND.bgSoft,
-    color: BRAND.textMuted,
     padding: "1px 7px",
     borderRadius: "999px",
     fontWeight: 600,
@@ -954,7 +1261,7 @@ const styles = {
     minWidth: 0,
   },
   tableScroll: { overflowX: "auto" },
-  table: { width: "100%", borderCollapse: "collapse", minWidth: "780px" },
+  table: { width: "100%", borderCollapse: "collapse", minWidth: "820px" },
   th: {
     textAlign: "left",
     fontSize: "11px",
@@ -1013,7 +1320,13 @@ const styles = {
     whiteSpace: "nowrap",
   },
 
-  emailLink: { textDecoration: "none", color: "inherit", display: "block" },
+  emailCellBtn: {
+    background: "none",
+    border: "none",
+    padding: 0,
+    cursor: "pointer",
+    textAlign: "left",
+  },
   emailStack: { display: "flex", flexDirection: "column" },
   emailAddress: { fontSize: "13px", fontWeight: 600, color: BRAND.accent },
   emailSubLabel: { fontSize: "11px", color: BRAND.textMuted, marginTop: "1px" },
@@ -1150,4 +1463,133 @@ const styles = {
     fontSize: "12px",
     color: "rgba(255,255,255,0.55)",
   },
+
+  modalOverlay: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(11,37,69,0.45)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 50,
+    padding: "20px",
+  },
+  modalCard: {
+    background: BRAND.white,
+    borderRadius: "14px",
+    width: "100%",
+    maxHeight: "90vh",
+    overflowY: "auto",
+    padding: "22px 24px",
+    boxShadow: "0 20px 60px rgba(11,37,69,0.25)",
+  },
+  modalHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "16px",
+  },
+  modalTitle: {
+    fontFamily: "'Poppins', sans-serif",
+    fontSize: "17px",
+    fontWeight: 600,
+    color: BRAND.textDark,
+  },
+  modalClose: {
+    background: "none",
+    border: "none",
+    fontSize: "22px",
+    lineHeight: 1,
+    color: BRAND.textMuted,
+    cursor: "pointer",
+  },
+  modalActions: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "10px",
+    marginTop: "18px",
+  },
+  primaryBtn: {
+    background: BRAND.accent,
+    color: BRAND.white,
+    border: "none",
+    borderRadius: "8px",
+    padding: "10px 18px",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  secondaryBtn: {
+    background: BRAND.white,
+    color: BRAND.textDark,
+    border: `1px solid ${BRAND.border}`,
+    borderRadius: "8px",
+    padding: "10px 18px",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  formLabel: {
+    display: "block",
+    fontSize: "12px",
+    fontWeight: 600,
+    color: BRAND.textDark,
+    marginTop: "12px",
+    marginBottom: "5px",
+  },
+  formInput: {
+    width: "100%",
+    padding: "9px 11px",
+    borderRadius: "8px",
+    border: `1px solid ${BRAND.border}`,
+    fontSize: "13px",
+    color: BRAND.textDark,
+    background: BRAND.bgSoft,
+  },
+  formInputDisabled: {
+    width: "100%",
+    padding: "9px 11px",
+    borderRadius: "8px",
+    border: `1px solid ${BRAND.border}`,
+    fontSize: "13px",
+    color: BRAND.textMuted,
+    background: BRAND.bgSoft,
+    cursor: "not-allowed",
+  },
+  formTextarea: {
+    width: "100%",
+    padding: "9px 11px",
+    borderRadius: "8px",
+    border: `1px solid ${BRAND.border}`,
+    fontSize: "13px",
+    color: BRAND.textDark,
+    background: BRAND.bgSoft,
+    fontFamily: "'Inter', sans-serif",
+    resize: "vertical",
+  },
+  formHint: { fontSize: "12px", marginTop: "8px" },
+  profileHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    marginBottom: "18px",
+  },
+  profileName: {
+    fontFamily: "'Poppins', sans-serif",
+    fontSize: "16px",
+    fontWeight: 600,
+    color: BRAND.textDark,
+  },
+  profileRole: { fontSize: "13px", color: BRAND.textMuted, marginTop: "2px" },
+  profileGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" },
+  profileLabel: {
+    display: "block",
+    fontSize: "11px",
+    fontWeight: 700,
+    color: BRAND.textMuted,
+    textTransform: "uppercase",
+    letterSpacing: "0.4px",
+    marginBottom: "4px",
+  },
+  profileValue: { fontSize: "13px", color: BRAND.textDark },
 };

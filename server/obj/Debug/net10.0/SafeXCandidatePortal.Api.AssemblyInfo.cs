@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SafeXCandidatePortal.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a5075b0d0bef7324953c90f54e0fd40190d7140")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c59f3b37b38d0f20f15c19620fff0aba19847d23")]
 [assembly: System.Reflection.AssemblyProductAttribute("SafeXCandidatePortal.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SafeXCandidatePortal.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SafeXCandidatePortal.Api.Models;
+using SafeXCandidatePortal.Api.Services;
 
 namespace SafeXCandidatePortal.Api.Controllers;
 
@@ -7,7 +8,14 @@ namespace SafeXCandidatePortal.Api.Controllers;
 [Route("api/[controller]")]
 public class CandidatesController : ControllerBase
 {
-    //mock data as the frontend, now served from the backend
+    private readonly IEmailService _emailService;
+    private static int _nextId = 13;
+
+    public CandidatesController(IEmailService emailService)
+    {
+        _emailService = emailService;
+    }
+
     private static readonly List<Candidate> Candidates = new()
     {
         new Candidate { Id = 1, Name = "Fatima Khan", Role = "Frontend Developer Intern", Status = "Interview Scheduled", Email = "fatima.khan@example.com", Experience = "1 yr React", Location = "Islamabad", AppliedDate = "Jun 29" },
@@ -24,8 +32,6 @@ public class CandidatesController : ControllerBase
         new Candidate { Id = 12, Name = "Bilquis Noor", Role = "Data Analyst Intern", Status = "Hired", Email = "bilquis.noor@example.com", Experience = "1 yr SQL", Location = "Lahore", AppliedDate = "Jun 19" },
     };
 
-    // GET /api/candidates
-    // GET /api/candidates?search=fatima&status=Hired
     [HttpGet]
     public ActionResult<IEnumerable<Candidate>> GetAll([FromQuery] string? search, [FromQuery] string? status)
     {
@@ -46,12 +52,58 @@ public class CandidatesController : ControllerBase
         return Ok(results.ToList());
     }
 
-    // GET /api/candidates/5
     [HttpGet("{id}")]
     public ActionResult<Candidate> GetById(int id)
     {
         var candidate = Candidates.FirstOrDefault(c => c.Id == id);
         if (candidate is null) return NotFound();
         return Ok(candidate);
+    }
+
+    // POST /api/candidates
+    [HttpPost]
+    public ActionResult<Candidate> Create([FromBody] CandidateCreateRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Email))
+        {
+            return BadRequest("Name and email are required.");
+        }
+
+        var candidate = new Candidate
+        {
+            Id = _nextId++,
+            Name = request.Name,
+            Role = request.Role,
+            Status = string.IsNullOrWhiteSpace(request.Status) ? "New Application" : request.Status,
+            Email = request.Email,
+            Experience = request.Experience,
+            Location = request.Location,
+            AppliedDate = DateTime.Now.ToString("MMM d"),
+        };
+
+        Candidates.Add(candidate);
+        return CreatedAtAction(nameof(GetById), new { id = candidate.Id }, candidate);
+    }
+
+    // POST /api/candidates/5/email
+    [HttpPost("{id}/email")]
+    public async Task<IActionResult> SendEmail(int id, [FromBody] EmailRequest request)
+    {
+        var candidate = Candidates.FirstOrDefault(c => c.Id == id);
+        if (candidate is null) return NotFound();
+
+        if (string.IsNullOrWhiteSpace(request.Subject) || string.IsNullOrWhiteSpace(request.Body))
+        {
+            return BadRequest("Subject and body are required.");
+        }
+
+        var success = await _emailService.SendEmailAsync(candidate.Email, candidate.Name, request.Subject, request.Body);
+
+        if (!success)
+        {
+            return StatusCode(502, "Failed to send email. Check backend logs and SMTP settings.");
+        }
+
+        return Ok(new { message = $"Email sent to {candidate.Name}." });
     }
 }
