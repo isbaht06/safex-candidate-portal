@@ -33,10 +33,6 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 app.UseCors("AllowReactApp");
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Clear();
-app.Urls.Add($"http://0.0.0.0:{port}");
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

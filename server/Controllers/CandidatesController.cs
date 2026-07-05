@@ -56,15 +56,51 @@ public class CandidatesController : ControllerBase
     public ActionResult<Candidate> GetById(int id)
     {
         var candidate = Candidates.FirstOrDefault(c => c.Id == id);
-        if (candidate is null) return NotFound();
+
+        if (candidate is null)
+            return NotFound();
+
         return Ok(candidate);
+    }
+
+    // GET /api/candidates/5/resume
+    [HttpGet("{id}/resume")]
+    public ActionResult GetResume(int id)
+    {
+        var candidate = Candidates.FirstOrDefault(c => c.Id == id);
+
+        if (candidate is null)
+            return NotFound();
+
+        var resumeText =
+$@"{candidate.Name}
+{candidate.Role} Applicant
+
+Location: {candidate.Location}
+Email: {candidate.Email}
+Experience: {candidate.Experience}
+Application Status: {candidate.Status}
+Applied: {candidate.AppliedDate}
+
+------------------------------------------------------------
+This is a generated resume summary based on the candidate's
+application record. Uploaded resume file storage is not yet
+connected to this portal.
+------------------------------------------------------------";
+
+        return Ok(new
+        {
+            fileName = $"{candidate.Name.Replace(" ", "_")}_Resume.txt",
+            content = resumeText
+        });
     }
 
     // POST /api/candidates
     [HttpPost]
     public ActionResult<Candidate> Create([FromBody] CandidateCreateRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Email))
+        if (string.IsNullOrWhiteSpace(request.Name) ||
+            string.IsNullOrWhiteSpace(request.Email))
         {
             return BadRequest("Name and email are required.");
         }
@@ -74,7 +110,9 @@ public class CandidatesController : ControllerBase
             Id = _nextId++,
             Name = request.Name,
             Role = request.Role,
-            Status = string.IsNullOrWhiteSpace(request.Status) ? "New Application" : request.Status,
+            Status = string.IsNullOrWhiteSpace(request.Status)
+                ? "New Application"
+                : request.Status,
             Email = request.Email,
             Experience = request.Experience,
             Location = request.Location,
@@ -82,6 +120,7 @@ public class CandidatesController : ControllerBase
         };
 
         Candidates.Add(candidate);
+
         return CreatedAtAction(nameof(GetById), new { id = candidate.Id }, candidate);
     }
 
@@ -90,20 +129,30 @@ public class CandidatesController : ControllerBase
     public async Task<IActionResult> SendEmail(int id, [FromBody] EmailRequest request)
     {
         var candidate = Candidates.FirstOrDefault(c => c.Id == id);
-        if (candidate is null) return NotFound();
 
-        if (string.IsNullOrWhiteSpace(request.Subject) || string.IsNullOrWhiteSpace(request.Body))
+        if (candidate is null)
+            return NotFound();
+
+        if (string.IsNullOrWhiteSpace(request.Subject) ||
+            string.IsNullOrWhiteSpace(request.Body))
         {
             return BadRequest("Subject and body are required.");
         }
 
-        var success = await _emailService.SendEmailAsync(candidate.Email, candidate.Name, request.Subject, request.Body);
+        var success = await _emailService.SendEmailAsync(
+            candidate.Email,
+            candidate.Name,
+            request.Subject,
+            request.Body);
 
         if (!success)
         {
             return StatusCode(502, "Failed to send email. Check backend logs and SMTP settings.");
         }
 
-        return Ok(new { message = $"Email sent to {candidate.Name}." });
+        return Ok(new
+        {
+            message = $"Email sent to {candidate.Name}."
+        });
     }
 }

@@ -320,6 +320,8 @@ export default function App() {
   const [emailBody, setEmailBody] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [emailResult, setEmailResult] = useState(null);
+  const [viewingResume, setViewingResume] = useState(null);
+  const [resumeLoading, setResumeLoading] = useState(false);
 
   useEffect(() => {
     fetch(`${apiUrl}/candidates`)
@@ -389,10 +391,30 @@ export default function App() {
     setTimeout(() => setSupportSent(false), 4000);
   };
 
-  const handleResume = (name) =>
-    alert(
-      `Resume preview for ${name} — coming soon once file storage is connected.`,
-    );
+  const openResume = async (candidate) => {
+    setResumeLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/candidates/${candidate.id}/resume`);
+      if (!res.ok) throw new Error("Server rejected the request");
+      const data = await res.json();
+      setViewingResume(data);
+    } catch (err) {
+      console.error(err);
+      alert("Couldn't load the resume. Is the backend running?");
+    } finally {
+      setResumeLoading(false);
+    }
+  };
+  const closeResume = () => setViewingResume(null);
+  const downloadResume = () => {
+    const blob = new Blob([viewingResume.content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = viewingResume.fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   // ---- Add Candidate ----
   const closeAddModal = () => {
@@ -717,7 +739,8 @@ export default function App() {
                                     title="View resume"
                                     aria-label={`View ${c.name}'s resume`}
                                     style={styles.actionBtn}
-                                    onClick={() => handleResume(c.name)}
+                                    onClick={() => openResume(c)}
+                                    disabled={resumeLoading}
                                   >
                                     <IconDocument />
                                   </button>
@@ -1052,6 +1075,21 @@ export default function App() {
               </button>
             </div>
           </form>
+        </Modal>
+      )}
+
+      {/* Resume Modal */}
+      {viewingResume && (
+        <Modal title="Resume Preview" onClose={closeResume} width={480}>
+          <pre style={styles.resumeBlock}>{viewingResume.content}</pre>
+          <div style={styles.modalActions}>
+            <button style={styles.secondaryBtn} onClick={closeResume}>
+              Close
+            </button>
+            <button style={styles.primaryBtn} onClick={downloadResume}>
+              Download .txt
+            </button>
+          </div>
         </Modal>
       )}
     </div>
@@ -1592,4 +1630,17 @@ const styles = {
     marginBottom: "4px",
   },
   profileValue: { fontSize: "13px", color: BRAND.textDark },
+  resumeBlock: {
+    background: BRAND.bgSoft,
+    border: `1px solid ${BRAND.border}`,
+    borderRadius: "8px",
+    padding: "14px 16px",
+    fontSize: "12.5px",
+    lineHeight: 1.6,
+    color: BRAND.textDark,
+    whiteSpace: "pre-wrap",
+    fontFamily: "'Courier New', monospace",
+    maxHeight: "320px",
+    overflowY: "auto",
+  },
 };
